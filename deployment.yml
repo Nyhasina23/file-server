@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-server-deployment
+  labels:
+    app: file-server-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-server-app
+  template:
+    metadata:
+      labels:
+        app: file-server-app
+    spec:
+      containers:
+        - name: file-server-container
+          image: andritianaa/file-server:v2.0.6
+          ports:
+            - containerPort: 3002
+          volumeMounts:
+            - name: "static-file"
+              mountPath: "/public"
+      volumes:
+        - name: "static-file"
+          persistentVolumeClaim:
+            claimName: "pvc-fileserver"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: file-server-service
+spec:
+  selector:
+    app: file-server-app
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 3002
+      targetPort: 3002
