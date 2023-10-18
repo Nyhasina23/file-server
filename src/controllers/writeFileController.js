@@ -10,14 +10,13 @@ const writeFileController = (req, res) => {
 
     const { type, dataHistory } = req.body;
 
-    switch (type) {
-      case "VINS":
-        writeHistoryFile(
-          DIR + "/vins.history.txt",
-          `
+    if (type === "VINS") {
+      writeHistoryFile(
+        DIR + "/vins.history.txt",
+        `
 Date : ${todayDate}
 Heure : ${todayTime}
-    
+  
 ${
   dataHistory.nomPlat != null
     ? "Nom du plat inseré : " + dataHistory.nomPlat
@@ -32,15 +31,15 @@ ${
 
 -------------------------------------------------------------------------------------
 
+      `
+      );
+    } else if (type === "PLATS") {
+      writeHistoryFile(
+        DIR + "/plats.history.txt",
         `
-        );
-      case "PLATS":
-        writeHistoryFile(
-          DIR + "/plats.history.txt",
-          `
 Date : ${todayDate}
 Heure : ${todayTime}
-    
+  
 ${dataHistory.domaine != null ? "Domaine inseré : " + dataHistory.domaine : ""}
 ${
   dataHistory.millesime != null
@@ -69,12 +68,12 @@ ${
 }                  
 
 -------------------------------------------------------------------------------------
+      `
+      );
+    } else {
+      writeHistoryFile(
+        DIR + "/accord.history.txt",
         `
-        );
-      case "ACCORD":
-        writeHistoryFile(
-          DIR + "/accord.history.txt",
-          `
 Date : ${todayDate}
 Heure : ${todayTime}
 
@@ -107,8 +106,8 @@ ${
 ${dataHistory.arome != null ? "Arôme inserée : " + dataHistory.arome : ""}
 
 -------------------------------------------------------------------------------------
-        `
-        );
+      `
+      );
     }
 
     res.status(200).send("Writing history done.");
