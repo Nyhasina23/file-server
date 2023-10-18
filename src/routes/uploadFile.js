@@ -1,20 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const DIR = "./public/";
-const writeFileController = require("../controllers/writeFileController");
-
+const DIR = "./public/upload/";
 const {
   StaticFileController,
 } = require("../controllers/staticFileControllers.controllers");
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, DIR);
   },
   filename: (req, file, cb) => {
-    const fileName = Date.now().toString() + ".jpg";
-
-    cb(null, fileName);
+    cb(null, file.originalname);
   },
 });
 
@@ -24,21 +21,23 @@ var upload = multer({
     if (
       file.mimetype == "image/png" ||
       file.mimetype == "image/jpg" ||
-      file.mimetype == "image/jpeg"
+      file.mimetype == "image/jpeg" ||
+      file.mimetype == "video/mp4" ||
+      file.mimetype == "audio/*"
     ) {
       cb(null, true);
     } else {
       cb(null, false);
-      return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
+      return cb(
+        new Error("Only .png, .jpg and .jpeg mp4 and audio format allowed!")
+      );
     }
   },
 });
 
-router.post("/", StaticFileController.receiveFromServer);
 router.post(
-  "/upload",
-  upload.array("images", Number.POSITIVE_INFINITY),
-  StaticFileController.upload
+  "/uploadFile",
+  upload.array("uploads", Number.POSITIVE_INFINITY),
+  StaticFileController.uploadFile
 );
-router.post("/history/write", (req, res) => writeFileController(req, res));
 module.exports = router;
